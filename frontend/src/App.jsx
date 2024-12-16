@@ -52,6 +52,8 @@ function App() {
         <div>
           <p>Username: {user.username}</p>
           <p>Password: {user.password}</p>
+          <input type="text" placeholder = "New "/>
+          <button>Change Username</button>
         </div>
       ))}
     </>
