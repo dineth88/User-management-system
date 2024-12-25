@@ -11,6 +11,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
         return super().create(validated_data)
+    
+    def to_representation(self, instance):
+        # Include the hashed password in the response (don't expose plaintext password)
+        representation = super().to_representation(instance)
+        representation['password'] = instance.password  # Add the hashed password explicitly
+        return representation
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:

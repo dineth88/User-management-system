@@ -1,87 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-    fetchQuestions,
-} from '../features/questions/questionsSlice';
-import {
-    fetchUserAnswers,
-    addAnswer,
-    updateAnswer,
-    deleteAnswer,
-} from '../features/answers/answersSlice';
+import axios from 'axios';
 
 const UserDashboard = () => {
-    const dispatch = useDispatch();
-    const questions = useSelector((state) => state.questions.items);
-    const userAnswers = useSelector((state) => state.answers.items);
-
+    const [questions, setQuestions] = useState([]);
     const [answer, setAnswer] = useState('');
-    const [editingAnswer, setEditingAnswer] = useState(null);
-    const [editedText, setEditedText] = useState('');
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchQuestions());
-        dispatch(fetchUserAnswers());
-    }, [dispatch]);
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/api/users/', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                //console.log(response.data[0]);
+                setUserData(response.data[0]); // Assuming the response contains the current user data
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+            }
+        };
 
-    const handleAnswerSubmit = async (questionId) => {
-        try {
-            await dispatch(addAnswer({ questionId, text: answer })).unwrap(); // Optimistically update
-            setAnswer(''); // Clear the answer input
-        } catch (error) {
-            console.error('Error submitting answer:', error);
-        }
-    };
-    
-    
+        fetchUserData();
+    }, []);
 
-    const handleEditAnswer = (answerId) => {
-        dispatch(updateAnswer({ answerId, text: editedText }));
-        setEditingAnswer(null);
-        setEditedText('');
-    };
-
-    const handleDeleteAnswer = (answerId) => {
-        dispatch(deleteAnswer(answerId));
-    };
 
     return (
         <div>
             <h1>User Dashboard</h1>
-            <h2>Questions</h2>
-            {questions.map((question) => (
-                <div key={question.id}>
-                    <p>{question.text}</p>
-                    <textarea
-                        placeholder="Type your answer here..."
-                        value={answer}
-                        onChange={(e) => setAnswer(e.target.value)}
-                    />
-                    <button onClick={() => handleAnswerSubmit(question.id)}>Submit Answer</button>
+            {userData && (
+                <div>
+                    <p>Username: {userData.username}</p>
+                    <p>Hashed Password: {userData.password}</p>
                 </div>
-            ))}
-            <h2>Your Answers</h2>
-            {userAnswers.map((ans) => (
-                <div key={ans.id}>
-                    <p>Question: {ans.question.text}</p>
-                    {editingAnswer === ans.id ? (
-                        <>
-                            <textarea
-                                value={editedText}
-                                onChange={(e) => setEditedText(e.target.value)}
-                            />
-                            <button onClick={() => handleEditAnswer(ans.id)}>Save</button>
-                            <button onClick={() => setEditingAnswer(null)}>Cancel</button>
-                        </>
-                    ) : (
-                        <>
-                            <p>Answer: {ans.text}</p>
-                            <button onClick={() => setEditingAnswer(ans.id)}>Edit</button>
-                            <button onClick={() => handleDeleteAnswer(ans.id)}>Delete</button>
-                        </>
-                    )}
-                </div>
-            ))}
+            )}
+           
         </div>
     );
 };
