@@ -1,8 +1,10 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .models import CustomUser, Question, Answer
-from .serializers import CustomUserSerializer, QuestionSerializer, AnswerSerializer
-from rest_framework.permissions import BasePermission
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, BasePermission
+from .models import CustomUser
+from .serializers import CustomUserSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -13,14 +15,17 @@ class UserViewSet(viewsets.ModelViewSet):
             return [IsAdminUser()]
         return [IsAuthenticated()]
 
-class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
-    permission_classes = [IsAdminUser]
-
-    def perform_create(self, serializer):
-        # Ensure created_by is explicitly cast as a CustomUser instance
-        serializer.save(created_by=self.request.user)
+    @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = self.get_serializer(request.user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class IsOwner(BasePermission):
     """
@@ -29,11 +34,10 @@ class IsOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user
 
-class AnswerViewSet(viewsets.ModelViewSet):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
-
-    def get_queryset(self):
-        # Filter answers to show only the ones created by the logged-in user
-        return self.queryset.filter(user=self.request.user)
+class RegisterUserView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
