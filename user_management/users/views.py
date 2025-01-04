@@ -11,9 +11,9 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
 
     def get_permissions(self):
-        if self.request.method in ['PUT', 'DELETE']:
-            return [IsAdminUser()]
-        return [IsAuthenticated()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsSelfOrAdmin()]  # Custom permission
+        return [IsAuthenticated()]  # Default permission
 
     @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -21,11 +21,13 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(request.user)
             return Response(serializer.data)
         elif request.method == 'PUT':
+            # Handle the update
             serializer = self.get_serializer(request.user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         
 class IsOwner(BasePermission):
     """
@@ -41,3 +43,18 @@ class RegisterUserView(APIView):
             serializer.save()
             return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class IsSelfOrAdmin(BasePermission):
+    """
+    Custom permission to allow users to update their own profiles or admins to modify any user.
+    """
+    def has_object_permission(self, request, view, obj):
+        # Allow if the user is updating their own profile or is an admin
+        return obj == request.user or request.user.is_staff
+    
+class IsAdminOrReadOnly(BasePermission):
+    """
+    Allow full access to admin users and read-only access to others.
+    """
+    def has_permission(self, request, view):
+        return request.method in ('GET', 'HEAD', 'OPTIONS') or request.user.is_staff
