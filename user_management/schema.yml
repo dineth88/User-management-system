@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: User Management System
+  version: 1.0.0
+  description: Django-React App
+paths: {}
+components: {}
