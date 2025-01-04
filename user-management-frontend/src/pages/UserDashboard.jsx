@@ -3,12 +3,14 @@ import axios from 'axios';
 
 const UserDashboard = () => {
     const [userData, setUserData] = useState({
-        address: '',
-        age: '',
+        username: '',
+        password: '', // Display hashed password if available
+        status: '',
+        emp_id: '',
         role: '',
-        gender: '',
-    }); // State to manage user details
-    const [isEditing, setIsEditing] = useState(false); // State to toggle between view and edit modes
+        task: ''
+    });
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -18,7 +20,7 @@ const UserDashboard = () => {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
-                setUserData(response.data); // Assuming API returns user's details
+                setUserData(response.data);
             } catch (error) {
                 console.error('Failed to fetch user data:', error);
             }
@@ -34,15 +36,26 @@ const UserDashboard = () => {
 
     const handleSave = async () => {
         try {
-            await axios.put('http://127.0.0.1:8000/api/users/me/', userData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Authentication token not found. Please log in again.');
+                return;
+            }
+
+            const response = await axios.put(
+                'http://127.0.0.1:8000/api/users/me/',
+                userData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             alert('Details saved successfully!');
-            setIsEditing(false); // Exit edit mode after saving
+            setIsEditing(false);
         } catch (error) {
             console.error('Failed to save user details:', error);
+            alert('An error occurred. Please try again.');
         }
     };
 
@@ -54,43 +67,33 @@ const UserDashboard = () => {
                     <h2>Edit Your Details</h2>
                     <form>
                         <label>
-                            Address:
+                            Username:
                             <input
                                 type="text"
-                                name="address"
-                                value={userData.address}
+                                name="username"
+                                value={userData.username}
                                 onChange={handleChange}
                             />
                         </label>
                         <br />
                         <label>
-                            Age:
+                            Password:
                             <input
-                                type="number"
-                                name="age"
-                                value={userData.age}
+                                type="password"
+                                name="password"
+                                placeholder="Enter a new password"
                                 onChange={handleChange}
                             />
                         </label>
                         <br />
                         <label>
-                            Role:
+                            Status:
                             <input
                                 type="text"
-                                name="role"
-                                value={userData.role}
+                                name="status"
+                                value={userData.status}
                                 onChange={handleChange}
                             />
-                        </label>
-                        <br />
-                        <label>
-                            Gender:
-                            <select name="gender" value={userData.gender} onChange={handleChange}>
-                                <option value="">Select</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
                         </label>
                         <br />
                         <button type="button" onClick={handleSave}>
@@ -105,11 +108,11 @@ const UserDashboard = () => {
                 <div>
                     <h2>Your Details</h2>
                     <p>Username: {userData.username}</p>
-                    <p>Hashed Password: {userData.password}</p>
-                    <p>Address: {userData.address || 'Not provided'}</p>
-                    <p>Age: {userData.age || 'Not provided'}</p>
-                    <p>Role: {userData.role || 'Not provided'}</p>
-                    <p>Gender: {userData.gender || 'Not provided'}</p>
+                    <p>Password: {userData.password || 'Hidden'}</p>
+                    <p>Status: {userData.status || 'Not provided'}</p>
+                    <p>Employee ID: {userData.emp_id || 'Not provided'}</p> {/* Display emp_id */}
+                    <p>Role: {userData.role || 'Not provided'}</p> {/* Display role */}
+                    <p>Task: {userData.task || 'Not provided'}</p> {/* Display task */}
                     <button onClick={() => setIsEditing(true)}>Edit Details</button>
                 </div>
             )}
