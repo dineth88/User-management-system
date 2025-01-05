@@ -59,11 +59,35 @@ const AdminDashboard = () => {
                 }
             );
 
+            console.log(response);
+
             alert('Details saved successfully!');
             setIsEditing(false);
         } catch (error) {
             console.error('Failed to update user:', error);
             alert('Failed to update user, please check the data you are sending.');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Authentication token not found. Please log in again.');
+                return;
+            }
+
+            await axios.delete(`http://127.0.0.1:8000/api/users/${id}/`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            alert('User deleted successfully!');
+            setUserData(userData.filter(user => user.id !== id)); // Remove user from local state
+        } catch (error) {
+            console.error('Failed to delete user:', error);
+            alert('Failed to delete user, please try again.');
         }
     };
 
@@ -81,16 +105,6 @@ const AdminDashboard = () => {
                                 type="text"
                                 name="username"
                                 value={editUserData.username}
-                                onChange={handleChange}
-                            />
-                        </label>
-                        <br />
-                        <label>
-                            Password:
-                            <input
-                                type="password"
-                                name="password"
-                                value={editUserData.password}
                                 onChange={handleChange}
                             />
                         </label>
@@ -139,20 +153,27 @@ const AdminDashboard = () => {
                     <ul>
                         {userData.map((user) => (
                             <li key={user.id}>
-                                {user.username}
-                                <button onClick={() => {
-                                    setEditUserData({
-                                        id: user.id,
-                                        username: user.username,
-                                        password: '', // Do not expose password, just leave it empty
-                                        emp_id: user.emp_id,
-                                        role: user.role,
-                                        task: user.task
-                                    });
-                                    setIsEditing(true);
-                                }}>
+                                <p>Username: {user.username}</p>
+                                <p>Status: {user.status || 'Not provided'}</p> {/* Display status */}
+                                <p>Employee ID: {user.emp_id || 'Not provided'}</p>
+                                <p>Role: {user.role || 'Not provided'}</p>
+                                <p>Task: {user.task || 'Not provided'}</p>
+                                <button
+                                    onClick={() => {
+                                        setEditUserData({
+                                            id: user.id,
+                                            username: user.username,
+                                            password: user.username, 
+                                            emp_id: user.emp_id,
+                                            role: user.role,
+                                            task: user.task,
+                                        });
+                                        setIsEditing(true);
+                                    }}
+                                >
                                     Edit
-                                </button>
+                                    </button>
+                                <button onClick={() => handleDelete(user.id)}>Delete</button>
                             </li>
                         ))}
                     </ul>

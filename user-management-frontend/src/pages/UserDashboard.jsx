@@ -81,7 +81,7 @@ const UserDashboard = () => {
                             <input
                                 type="password"
                                 name="password"
-                                placeholder="Enter a new password"
+                                value={userData.password}
                                 onChange={handleChange}
                             />
                         </label>
@@ -108,7 +108,7 @@ const UserDashboard = () => {
                 <div>
                     <h2>Your Details</h2>
                     <p>Username: {userData.username}</p>
-                    <p>Password: {userData.password || 'Hidden'}</p>
+                    <p>Password: {userData.password ? userData.password : 'Hidden'}</p>
                     <p>Status: {userData.status || 'Not provided'}</p>
                     <p>Employee ID: {userData.emp_id || 'Not provided'}</p> {/* Display emp_id */}
                     <p>Role: {userData.role || 'Not provided'}</p> {/* Display role */}

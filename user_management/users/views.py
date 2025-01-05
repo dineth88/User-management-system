@@ -27,6 +27,14 @@ class UserViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def destroy(self, request, *args, **kwargs):
+        """Override the destroy method to add custom logic if needed."""
+        instance = self.get_object()
+        # Check if the user is allowed to delete this object
+        self.check_object_permissions(request, instance)
+        instance.delete()
+        return Response({'message': 'User deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
         
 class IsOwner(BasePermission):
@@ -46,11 +54,13 @@ class RegisterUserView(APIView):
     
 class IsSelfOrAdmin(BasePermission):
     """
-    Custom permission to allow users to update their own profiles or admins to modify any user.
+    Custom permission to allow users to update their own profiles or admins to modify or delete any user.
     """
     def has_object_permission(self, request, view, obj):
-        # Allow if the user is updating their own profile or is an admin
-        return obj == request.user or request.user.is_staff
+        # Allow if the user is updating/deleting their own profile or is an admin
+        if request.method in ['PUT', 'PATCH', 'DELETE']:
+            return obj == request.user or request.user.is_staff
+        return request.user.is_staff or obj == request.user
     
 class IsAdminOrReadOnly(BasePermission):
     """

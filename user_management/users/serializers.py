@@ -22,7 +22,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation.pop('password', None)  # Remove hashed password from output
+        representation['password'] = instance.password  # Include hashed password
         return representation
 
 
