@@ -28,6 +28,20 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        # Remove password if it's not intended to be updated
+        if 'password' in request.data:
+            request.data.pop('password')
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+        
     def destroy(self, request, *args, **kwargs):
         """Override the destroy method to add custom logic if needed."""
         instance = self.get_object()

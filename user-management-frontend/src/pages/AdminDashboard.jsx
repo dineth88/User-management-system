@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
+import { fetchUsers, updateUser, deleteUser } from '../features/admin/adminSlice'; // Assume userSlice contains Redux logic
 
 const AdminDashboard = () => {
-    const [userData, setUserData] = useState([]);
+    const dispatch = useDispatch();
+    const userData = useSelector((state) => state.users.data); // Use 'data' instead of 'userData'
     const [isEditing, setIsEditing] = useState(false);
     const [editUserData, setEditUserData] = useState({
         id: '',
@@ -16,20 +19,8 @@ const AdminDashboard = () => {
 
     // Fetch all users
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:8000/api/users/', {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                });
-                setUserData(response.data);
-            } catch (error) {
-                console.error('Failed to fetch users:', error);
-            }
-        };
-        fetchUsers();
-    }, []);
+        dispatch(fetchUsers());
+    }, [dispatch]);
 
     // Handle the change in the edit form fields
     const handleChange = (e) => {
@@ -40,27 +31,8 @@ const AdminDashboard = () => {
     // Save updated user data
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('Authentication token not found. Please log in again.');
-                return;
-            }
-
-            // Ensure that editUserData is valid
             console.log("Updated user data:", editUserData);
-
-            const response = await axios.put(
-                `http://127.0.0.1:8000/api/users/${editUserData.id}/`,  // Ensure correct endpoint and user ID
-                editUserData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            console.log(response);
-
+            await dispatch(updateUser(editUserData));
             alert('Details saved successfully!');
             setIsEditing(false);
         } catch (error) {
@@ -71,20 +43,8 @@ const AdminDashboard = () => {
 
     const handleDelete = async (id) => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('Authentication token not found. Please log in again.');
-                return;
-            }
-
-            await axios.delete(`http://127.0.0.1:8000/api/users/${id}/`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
+            await dispatch(deleteUser(id));
             alert('User deleted successfully!');
-            setUserData(userData.filter(user => user.id !== id)); // Remove user from local state
         } catch (error) {
             console.error('Failed to delete user:', error);
             alert('Failed to delete user, please try again.');
@@ -163,16 +123,16 @@ const AdminDashboard = () => {
                                         setEditUserData({
                                             id: user.id,
                                             username: user.username,
-                                            password: user.username, 
                                             emp_id: user.emp_id,
                                             role: user.role,
                                             task: user.task,
+                                            status: user.status, // Add status if it's included in your form
                                         });
                                         setIsEditing(true);
                                     }}
                                 >
                                     Edit
-                                    </button>
+                                </button>
                                 <button onClick={() => handleDelete(user.id)}>Delete</button>
                             </li>
                         ))}

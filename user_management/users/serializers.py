@@ -3,12 +3,13 @@ from .models import CustomUser
 from django.contrib.auth.hashers import make_password
 
 # serializers.py
-
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'password', 'status', 'emp_id', 'role', 'task']  # Ensure all fields are listed here
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {
+            'password': {'write_only': True, 'required': False},  # Make password optional
+        }
 
     def create(self, validated_data):
         if 'password' in validated_data:
@@ -22,8 +23,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['password'] = instance.password  # Include hashed password
+        representation.pop('password', None)  # Exclude password from the response
         return representation
+
 
 
 
