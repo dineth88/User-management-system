@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import { setErrorMessage } from '../features/auth/registerSlice';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import "../index.css";
+
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -60,7 +62,7 @@ const Register = () => {
     };
 
     return (
-        <div>
+        <div className="form-container sign-up-container">
             <h1>Register</h1>
             <form onSubmit={handleRegister}>
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}

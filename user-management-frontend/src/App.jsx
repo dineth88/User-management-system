@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
 import Register from './pages/Register';
+import LoginHandler from './pages/LoginHandler';
 
 const App = () => (
     <Provider store={store}>
@@ -15,6 +16,7 @@ const App = () => (
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/dashboard" element={<UserDashboard />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/handler" element={<LoginHandler />} />
             </Routes>
         </Router>
     </Provider>

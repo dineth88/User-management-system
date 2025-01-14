@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, setError } from '../features/auth/authSlice';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import "../index.css";
+
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -24,7 +26,7 @@ const Login = () => {
     };
 
     return (
-        <div>
+        <div className="form-container sign-in-container">
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <input
