@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
 import ".././index.css";
+import Logo from "../assets/logo.svg"
 
 export default function LoginHandler() {
   const [type, setType] = useState("signIn");
@@ -15,14 +16,13 @@ export default function LoginHandler() {
     "container " + (type === "signUp" ? "right-panel-active" : "");
   return (
     <div className="App">
-      <h2>Sign in/up Form</h2>
       <div className={containerClass} id="container">
         <Register />
         <Login />
         <div className="overlay-container">
-          <div className="overlay">
+          <div className="overlay ">
             <div className="overlay-panel overlay-left">
-              <h1>Welcome Back!</h1>
+              <img src={Logo} alt="Logo" />
               <p>
                 To keep connected with us please login with your personal info
               </p>
@@ -35,7 +35,7 @@ export default function LoginHandler() {
               </button>
             </div>
             <div className="overlay-panel overlay-right">
-              <h1>Hello, Friend!</h1>
+              <img src={Logo} alt="Logo" />
               <p>Enter your personal details and start journey with us</p>
               <button
                 className="ghost "

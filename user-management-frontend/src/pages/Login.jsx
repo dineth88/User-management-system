@@ -4,17 +4,27 @@ import { setCredentials, setError } from '../features/auth/authSlice';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../index.css";
-
+import { setErrorMessage } from '../features/auth/loginSlice';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const error = useSelector((state) => state.auth.error);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validation
+        if (!username || !password) {
+            setErrorMessage('All fields are required.');
+            return;
+        }
+
+        // Clear error message
+        setErrorMessage('');
+
         try {
             const response = await axios.post('http://127.0.0.1:8000/api/token/', { username, password });
             dispatch(setCredentials({ user: username, token: response.data.access }));
@@ -27,8 +37,8 @@ const Login = () => {
 
     return (
         <div className="form-container sign-in-container">
-            <h1>Login</h1>
             <form onSubmit={handleSubmit}>
+                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
                 <input
                     type="text"
                     placeholder="Email"
@@ -43,7 +53,6 @@ const Login = () => {
                 />
                 <button type="submit">Login</button>
             </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );
 };

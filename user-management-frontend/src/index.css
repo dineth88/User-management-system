@@ -76,8 +76,6 @@ button:focus-visible {
   text-align: center;
 }
 
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
-
 * {
   box-sizing: border-box;
 }
@@ -123,8 +121,8 @@ a {
 
 button {
   border-radius: 20px;
-  border: 1px solid #ff4b2b;
-  background-color: #ff4b2b;
+  border: 1px solid rgb(38, 36, 36);
+  background-color: rgb(38, 36, 36);
   color: #ffffff;
   font-size: 12px;
   font-weight: bold;
@@ -239,9 +237,7 @@ input {
 }
 
 .overlay {
-  background: #ff416c;
-  background: -webkit-linear-gradient(to right, #ff4b2b, #ff416c);
-  background: linear-gradient(to right, #ff4b2b, #ff416c);
+  background: rgb(38, 36, 36);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
