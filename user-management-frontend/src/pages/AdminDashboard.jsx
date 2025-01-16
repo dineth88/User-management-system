@@ -108,35 +108,67 @@ const AdminDashboard = () => {
                     </form>
                 </div>
             ) : (
-                <div>
-                    <h2>User List</h2>
-                    <ul>
-                        {userData.map((user) => (
-                            <li key={user.id}>
-                                <p>Username: {user.username}</p>
-                                <p>Status: {user.status || 'Not provided'}</p> {/* Display status */}
-                                <p>Employee ID: {user.emp_id || 'Not provided'}</p>
-                                <p>Role: {user.role || 'Not provided'}</p>
-                                <p>Task: {user.task || 'Not provided'}</p>
-                                <button
-                                    onClick={() => {
-                                        setEditUserData({
-                                            id: user.id,
-                                            username: user.username,
-                                            emp_id: user.emp_id,
-                                            role: user.role,
-                                            task: user.task,
-                                            status: user.status, // Add status if it's included in your form
-                                        });
-                                        setIsEditing(true);
-                                    }}
-                                >
-                                    Edit
-                                </button>
-                                <button onClick={() => handleDelete(user.id)}>Delete</button>
-                            </li>
-                        ))}
-                    </ul>
+                <div  className='relative'>
+                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        Username
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Employee ID
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Role
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Task
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Status
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Action
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {userData.map((user) => (user.username!='admin' &&
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" key={user.id}>
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{user.username}</th>
+                                        <td class="px-6 py-4">{user.status || 'Not provided'}</td> {/* Display status */}
+                                        <td class="px-6 py-4">{user.emp_id || 'Not provided'}</td>
+                                        <td class="px-6 py-4">{user.role || 'Not provided'}</td>
+                                        <td class="px-6 py-4">{user.task || 'Not provided'}</td>
+                                        <td class="px-6 py-4">
+                                        <button
+                                            onClick={() => {
+                                                setEditUserData({
+                                                    id: user.id,
+                                                    username: user.username,
+                                                    emp_id: user.emp_id,
+                                                    role: user.role,
+                                                    task: user.task,
+                                                    status: user.status, // Add status if it's included in your form
+                                                });
+                                                setIsEditing(true);
+                                            }}
+                                        >
+                                            Edit
+                                        </button>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <button onClick={() => handleDelete(user.id)}>Delete</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>
