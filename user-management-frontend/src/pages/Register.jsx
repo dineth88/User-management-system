@@ -7,6 +7,7 @@ import "../index.css";
 
 
 const Register = () => {
+    const [fullname, setFullname] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,7 +29,7 @@ const Register = () => {
         e.preventDefault();
 
         // Validation
-        if (!username || !password || !confirmPassword) {
+        if (!username || !password || !confirmPassword || !fullname) {
             setErrorMessage('All fields are required.');
             return;
         }
@@ -53,7 +54,7 @@ const Register = () => {
         setErrorMessage('');
 
         try {
-            await axios.post('http://127.0.0.1:8000/api/register/', { username, password });
+            await axios.post('http://127.0.0.1:8000/api/register/', { fullname, username, password });
             alert('Registration successful!');
             navigate('/login');
         } catch (err) {
@@ -65,6 +66,12 @@ const Register = () => {
         <div className="form-container sign-up-container">
             <form onSubmit={handleRegister}>
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                <input
+                    type="text"
+                    placeholder="Name"
+                    value={fullname}
+                    onChange={(e) => setFullname(e.target.value)}
+                />
                 <input
                     type="email"
                     placeholder="Email"

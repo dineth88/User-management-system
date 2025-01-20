@@ -4,6 +4,7 @@ import axios from 'axios';
 const initialState = {
   userData: {
     username: '',
+    fullname: '',
     password: '',
     status: '',
     emp_id: '',

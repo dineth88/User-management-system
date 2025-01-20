@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'status', 'emp_id', 'role', 'task']  # Ensure all fields are listed here
+        fields = ['id', 'username', 'fullname','password', 'status', 'emp_id', 'role', 'task']  # Ensure all fields are listed here
         extra_kwargs = {
             'password': {'write_only': True, 'required': False},  # Make password optional
         }
@@ -25,6 +25,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation.pop('password', None)  # Exclude password from the response
         return representation
+    
+# class TaskSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Task
+#         fields = ['id', 'title', 'status', 'assigned_to']
 
 
 

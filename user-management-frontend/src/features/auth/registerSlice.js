@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+    fullname: '',
     username: '',
     password: '',
     confirmPassword: '',
@@ -11,6 +12,9 @@ const registerSlice = createSlice({
     name: 'register',
     initialState,
     reducers: {
+        setFullname: (state, action) => {
+            state.fullname = action.payload;
+        },
         setUsername: (state, action) => {
             state.username = action.payload;
         },
@@ -24,6 +28,7 @@ const registerSlice = createSlice({
             state.errorMessage = action.payload;
         },
         clearForm: (state) => {
+            state.fullname = '';
             state.username = '';
             state.password = '';
             state.confirmPassword = '';
@@ -32,6 +37,6 @@ const registerSlice = createSlice({
     },
 });
 
-export const { setUsername, setPassword, setConfirmPassword, setErrorMessage, clearForm } = registerSlice.actions;
+export const { setFullname, setUsername, setPassword, setConfirmPassword, setErrorMessage, clearForm } = registerSlice.actions;
 
 export default registerSlice.reducer;

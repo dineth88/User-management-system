@@ -47,13 +47,22 @@ const UserDashboard = () => {
     <div>
       <h1>User Dashboard</h1>
       {isEditing ? (
-        <div>
-          <h2>Edit Your Details</h2>
+        <div className='top-10 relative '>
           <form>
             <label>
-              Username:
+              Fullname:
               <input
                 type="text"
+                name="fullname"
+                value={localUserData.fullname || ''}  // Ensure value is always controlled
+                onChange={handleChange}
+              />
+            </label>
+            <br />
+            <label>
+              Email:
+              <input
+                type="email"
                 name="username"
                 value={localUserData.username || ''}  // Ensure value is always controlled
                 onChange={handleChange}
@@ -80,18 +89,20 @@ const UserDashboard = () => {
               />
             </label>
             <br />
-            <button type="button" onClick={handleSave}>
-              Save
-            </button>
-            <button type="button" onClick={() => setIsEditing(false)}>
-              Cancel
-            </button>
+            <div className="flex gap-5">
+              <button type="button" onClick={handleSave}>
+                Save
+              </button>
+              <button type="button" onClick={() => setIsEditing(false)}>
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       ) : (
         <div>
-          <h2>Your Details</h2>
-          <p>Username: {localUserData.username || 'Not provided'}</p>
+          <p>Fullname: {localUserData.fullname || 'Not provided'}</p>
+          <p>Email: {localUserData.username || 'Not provided'}</p>
           <p>Password: {localUserData.password ? localUserData.password : 'Hidden'}</p>
           <p>Status: {localUserData.status || 'Not provided'}</p>
           <p>Employee ID: {localUserData.emp_id || 'Not provided'}</p>
