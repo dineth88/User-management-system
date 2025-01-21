@@ -9,7 +9,6 @@ const initialState = {
     status: '',
     emp_id: '',
     role: '',
-    task: '',
   },
   loading: false,
   error: null,

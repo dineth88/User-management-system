@@ -1,7 +1,7 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics, permissions
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, BasePermission
-from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .models import CustomUser, Task
+from .serializers import CustomUserSerializer, TaskSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -82,3 +82,21 @@ class IsAdminOrReadOnly(BasePermission):
     """
     def has_permission(self, request, view):
         return request.method in ('GET', 'HEAD', 'OPTIONS') or request.user.is_staff
+
+# List all tasks and create a new task
+class TaskListCreateView(generics.ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.AllowAny]  # Ensure the user is authenticated
+
+    def perform_create(self, serializer):
+        """
+        Custom behavior during task creation.
+        """
+        serializer.save()
+
+# Retrieve, update, or delete a specific task
+class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated

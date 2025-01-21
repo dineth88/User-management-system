@@ -107,7 +107,6 @@ const UserDashboard = () => {
           <p>Status: {localUserData.status || 'Not provided'}</p>
           <p>Employee ID: {localUserData.emp_id || 'Not provided'}</p>
           <p>Role: {localUserData.role || 'Not provided'}</p>
-          <p>Task: {localUserData.task || 'Not provided'}</p>
           <button onClick={() => setIsEditing(true)}>Edit Details</button>
         </div>
       )}

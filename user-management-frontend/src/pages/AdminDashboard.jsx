@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { fetchUsers, updateUser, deleteUser } from '../features/admin/adminSlice'; // Assume userSlice contains Redux logic
+import { fetchTasks, createTask, updateTask, deleteTask } from '../features/admin/taskSlice';
+import { selectUserData, selectTaskData, selectTasksForUser } from '../features/user/userSelectors';
 
 const AdminDashboard = () => {
     const dispatch = useDispatch();
-    const userData = useSelector((state) => state.users.data); // Use 'data' instead of 'userData'
+    const userData = useSelector((state) => state.users.data);
+    const taskData = useSelector(selectTaskData);
     const [isEditing, setIsEditing] = useState(false);
+    const [isManagingTasks, setIsManagingTasks] = useState(false);
     const [editUserData, setEditUserData] = useState({
         id: '',
         username: '',
@@ -14,12 +18,18 @@ const AdminDashboard = () => {
         status: '',
         emp_id: '',
         role: '',
-        task: ''
     });
+    const [newTask, setNewTask] = useState({
+        task_title: '',
+        task_status: '',
+        assigned_to: '',
+    });
+    const tasksForSelectedUser = useSelector(selectTasksForUser(editUserData.id));
 
     // Fetch all users
     useEffect(() => {
         dispatch(fetchUsers());
+        dispatch(fetchTasks());
     }, [dispatch]);
 
     // Handle the change in the edit form fields
@@ -48,6 +58,40 @@ const AdminDashboard = () => {
         } catch (error) {
             console.error('Failed to delete user:', error);
             alert('Failed to delete user, please try again.');
+        }
+    };
+
+    // Handle task creation
+    const handleTaskCreate = async () => {
+        try {
+            await dispatch(createTask(newTask));
+            alert('Task created successfully!');
+            setNewTask({ task_title: '', task_status: '', assigned_to: '' });
+        } catch (error) {
+            console.error('Failed to create task:', error);
+            alert('Failed to create task.');
+        }
+    };
+
+    // Handle task updates
+    const handleTaskUpdate = async (task) => {
+        try {
+            await dispatch(updateTask(task));
+            alert('Task updated successfully!');
+        } catch (error) {
+            console.error('Failed to update task:', error);
+            alert('Failed to update task.');
+        }
+    };
+
+    // Handle task deletion
+    const handleTaskDelete = async (taskId) => {
+        try {
+            await dispatch(deleteTask(taskId));
+            alert('Task deleted successfully!');
+        } catch (error) {
+            console.error('Failed to delete task:', error);
+            alert('Failed to delete task.');
         }
     };
 
@@ -89,16 +133,6 @@ const AdminDashboard = () => {
                             />
                         </label>
                         <br />
-                        <label>
-                            Task:
-                            <input
-                                type="text"
-                                name="task"
-                                value={editUserData.task}
-                                onChange={handleChange}
-                            />
-                        </label>
-                        <br />
                         <button type="button" onClick={handleSave}>
                             Save
                         </button>
@@ -106,6 +140,48 @@ const AdminDashboard = () => {
                             Cancel
                         </button>
                     </form>
+                </div>
+            ) : isManagingTasks ? (
+                <div>
+                    <h2>Manage Tasks</h2>
+                    <form>
+                        <label>
+                            Task Title:
+                            <input
+                                type="text"
+                                name="task_title"
+                                value={newTask.task_title}
+                                onChange={(e) => setNewTask({ ...newTask, task_title: e.target.value })}
+                            />
+                        </label>
+                        <br />
+                        <label>
+                            Task Status:
+                            <input
+                                type="text"
+                                name="task_status"
+                                value={newTask.task_status}
+                                onChange={(e) => setNewTask({ ...newTask, task_status: e.target.value })}
+                            />
+                        </label>
+                        <br />
+                        <button type="button" onClick={() => dispatch(createTask(newTask))}>
+                            Add Task
+                        </button>
+                        <button type="button" onClick={() => setIsManagingTasks(false)}>
+                            Back
+                        </button>
+                    </form>
+                    <h3>Existing Tasks</h3>
+                    {tasksForSelectedUser.map((task) => (
+                        <div key={task.id}>
+                            <p>
+                                {task.task_title} - {task.task_status}
+                            </p>
+                            <button onClick={() => dispatch(updateTask(task))}>Edit</button>
+                            <button onClick={() => dispatch(deleteTask(task.id))}>Delete</button>
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <div  className='relative'>
@@ -124,9 +200,6 @@ const AdminDashboard = () => {
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Role
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Task
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Status
@@ -148,24 +221,29 @@ const AdminDashboard = () => {
                                         <td class="px-6 py-4">{user.role || 'Not provided'}</td>
                                         <td class="px-6 py-4">{user.task || 'Not provided'}</td>
                                         <td class="px-6 py-4">
-                                        <button
-                                            onClick={() => {
-                                                setEditUserData({
-                                                    id: user.id,
-                                                    username: user.username,
-                                                    emp_id: user.emp_id,
-                                                    role: user.role,
-                                                    task: user.task,
-                                                    status: user.status, // Add status if it's included in your form
-                                                });
-                                                setIsEditing(true);
-                                            }}
-                                        >
-                                            Edit
-                                        </button>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <button onClick={() => handleDelete(user.id)}>Delete</button>
+                                            <button
+                                                onClick={() => {
+                                                    setEditUserData({
+                                                        id: user.id,
+                                                        username: user.username,
+                                                        emp_id: user.emp_id,
+                                                        role: user.role,
+                                                        status: user.status, // Add status if it's included in your form
+                                                    });
+                                                    setIsEditing(true);
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button onClick={() => handleUserDelete(user.id)}>Delete</button>
+                                            <button
+                                                onClick={() => {
+                                                    setEditUserData(user);
+                                                    setIsManagingTasks(true);
+                                                }}
+                                            >
+                                                Manage Tasks
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -179,3 +257,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
