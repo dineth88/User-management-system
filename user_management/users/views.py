@@ -87,7 +87,6 @@ class IsAdminOrReadOnly(BasePermission):
 class TaskListCreateView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [permissions.AllowAny]  # Ensure the user is authenticated
 
     def perform_create(self, serializer):
         """
@@ -99,4 +98,4 @@ class TaskListCreateView(generics.ListCreateAPIView):
 class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Ensure the user is authenticated
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
